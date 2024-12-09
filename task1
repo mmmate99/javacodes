@@ -1,0 +1,105 @@
+//working with csv file
+package liblary;
+
+import java.io.File;
+import java.lang.reflect.Array;
+import java.util.*;
+
+//title, author, price
+public class Book implements Comparable<Book>{
+    private final String title;
+    private final String author;
+    private int price;
+
+    public Book(String title, String author, int price) {
+        this.title = title;
+        this.author = author;
+        this.price = price;
+    }
+
+// Constructor with default price
+    public Book(String title, String author){
+        this(title, author, 4999);
+    }
+
+//split the lines with ; 
+    public Book(String csvline){
+        String[] parts= csvline.split(";");
+        this.title = parts[0];
+        this.author = parts[1];
+        this.price= Integer.parseInt(parts[2]);
+    }
+
+//getters-setters
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+//toString 
+    @Override
+    public String toString() {
+        return title + ";" + author + ";" + price;
+    }
+
+//equals and hash
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equals(title, book.title) && Objects.equals(author, book.author);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, author);
+    }
+
+//order for the output 
+    @Override
+    public int compareTo(Book o) {
+        if(this.price != o.price){
+            return Integer.compare(o.price, this.price); // Descending order
+        }
+        int authorcomper= this.author.compareTo(o.author);
+        if(authorcomper != 0){
+            return authorcomper; // Ascending order
+        }
+        return this.title.compareTo(o.title); // Ascending order
+    }
+
+//main method
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        List<Book> books= new ArrayList<>();
+
+        while(sc.hasNextLine()){
+            String line = sc.nextLine();
+            if(line.isEmpty()){
+                break;
+            }
+            books.add(new Book(line));
+        }
+
+// Convert list to array, sort and write
+        Book[] bookArray= books.toArray(new Book[0]);
+        Arrays.sort(bookArray);
+
+        for(Book book : bookArray){
+            System.out.println(book);
+        }
+
+        sc.close();
+    }
+}
