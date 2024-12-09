@@ -1,0 +1,131 @@
+//same task as task1 + I made an enum, Comperator class and extansion of Movie class
+
+package movie;
+
+import java.lang.reflect.Array;
+import java.util.*;
+
+public class Movie implements Comparable<Movie>{
+    private final String title;
+    private final Genre genre;
+    private final int year;
+
+    public Movie(String csvline){
+        String[] parts= csvline.split(";");
+        this.title= parts[0];
+        this.genre= Genre.parseGenre(parts[1]);
+        this.year= Integer.parseInt(parts[2]);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    @Override
+    public String toString() {
+        return title + ";" + genre + ";" + year;
+    }
+
+    @Override
+    public int compareTo(Movie o) {
+        if(this.year != o.year){
+            return Integer.compare(this.year, o.year);
+        }
+        return this.title.compareTo(o.title);
+    }
+
+    public static enum Genre{
+        SCI_FI("Science Fiction"),
+        ACTION("Action"),
+        COMDEY("Comedy");
+
+        private final String name;
+
+        Genre(String name){
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static Genre parseGenre(String value){
+            for(Genre genre: values()){
+                if(genre.name.equals(value)){
+                    return genre;
+                }
+
+            }
+            return null;
+        }
+    }
+
+    public static class MovieComperator implements Comparator<Movie>{
+
+        @Override
+        public int compare(Movie o1, Movie o2) {
+            if(o1.year != o2.year){
+                return Integer.compare(o2.year, o1.year);
+            }
+            return o2.title.compareTo(o1.title);
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        List<Movie> movies = new ArrayList<>();
+
+        while(sc.hasNextLine()){
+            String line = sc.nextLine();
+            if(line.isEmpty()){
+                break;
+            }
+            String[] parts= line.split(";");
+            if(parts.length==4){
+                movies.add(new Series(line));
+            }else {
+                movies.add(new Movie(line));
+            }
+        }
+
+        Movie[] movieArray= movies.toArray(new Movie[0]);
+
+        Arrays.sort(movieArray);
+        for (Movie movie: movieArray){
+            System.out.println(movie);
+        }
+
+        System.out.println();
+
+        Arrays.sort(movieArray, new MovieComperator());
+        for (Movie movie : movieArray){
+            System.out.println(movie);
+        }
+
+        sc.close();
+    }
+
+}
+
+class Series extends Movie{
+    private final int seasons;
+
+    Series(String csvline) {
+        super(csvline);
+        String[] parts= csvline.split(";");
+        this.seasons= Integer.parseInt(parts[3]);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ";" + seasons;
+    }
+}
